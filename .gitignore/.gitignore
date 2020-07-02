@@ -1,0 +1,1469 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
+from nltk.corpus import stopwords 
+from nltk.tokenize import word_tokenize
+import collections
+import pandas as pd
+import matplotlib.pyplot as plt
+from nltk.corpus import stopwords 
+from nltk.tokenize import word_tokenize 
+import logging
+import pandas as pd
+import numpy as np
+from numpy import random
+import gensim
+import nltk
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.metrics import accuracy_score, confusion_matrix
+import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
+import re
+from bs4 import BeautifulSoup
+
+
+# In[2]:
+
+
+
+actbm = pd.read_csv("Documents/Propensity/fraud detection/trackmemactivity1.csv",sep="\t",names=['activityid',
+'cominfoid',
+'comtype',
+'senderid',
+'receiverid',
+'commatriid',
+'comdate',
+'comstatus',
+'activity',
+'syssource',
+'pagesource',
+'activityposition',
+'disclosedmatriid',
+'displaystatus',
+'dateread',
+'datedeleted',
+'dateupdated',
+'dumptime',
+'processid',
+'batchid',
+'processname'])
+
+
+# In[ ]:
+
+
+actbm.fillna(0,inplace=True)
+
+
+# In[5]:
+
+
+actbm_count = actbm.groupby(['senderid','comtype','disclosedmatriid','syssource','pagesource','activityposition']).size().reset_index(name='counts')
+
+
+# In[51]:
+
+
+actbm_count = actbm_copy.groupby(['senderid','comtype']).size().reset_index(name='counts')
+
+
+# In[53]:
+
+
+actbm_count = actbm_copy[['senderid','comtype']].groupby(['senderid','comtype']).count()
+
+
+# In[10]:
+
+
+check.to_csv("Documents/Propensity/fraud detection/check.csv")
+
+
+# In[5]:
+
+
+regdata = "select matriid, status, authorized, validated, name, age, gender, maritalstatus, noofchildren, height, mothertongue, religion, caste, educationselected, educationid, educationaddon, education, occupationcategory, occupationselected, occupation, incomecurrency, annualincome, annualincomeininr, income, incometype, citizenship, countryselected, residentstatus, residingstate, residingarea, residingdistrict, residingcity, residingcityid, profileverified, phoneverified, mobileverifiedon, phoneprotected, profiledescription, familydetailsavailable, lastlogin, timemodified, numberofpayments, lastpayment, validdays, expirydate, timecreated, profilepublishedon, bywhom ,ipaddress, comments, dateupdated from bmlandingzone.lz_his_matrimonyprofile where profilepublishedon > '2020-01-31 00:00:00' and profilepublishedon < '2020-02-28 00:00:00' "
+with open("Documents/Propensity/fraud detection/regdata.sql", "w+") as sql_file:
+        sql_file.write(regdata)
+
+
+# In[48]:
+
+
+
+registration = pd.read_csv("Documents/Propensity/fraud detection/registration_v1.csv",sep="\t",names=['cookie_id',
+'domain',
+'isp_address',
+'browser_details',
+'app_type',
+'app_version',
+'visited_time',
+'page_detail',
+'referral_url',
+'current_url',
+'target_url',
+'error_message',
+'camp_track_id',
+'reg_id',
+'matriid',
+'campaign'])
+
+
+# In[28]:
+
+
+
+regdata = pd.read_csv("Documents/Propensity/fraud detection/Fraud_regdata.csv",sep="\t",names=['language',
+'matriid',
+'status',
+'authorized',
+'validated',
+'entrytype',
+'specialpriv',
+'powerpackopted',
+'powerpackstatus',
+'name',
+'age',
+'dayofbirth',
+'monofbirth',
+'yearofbirth',
+'gender',
+'maritalstatus',
+'lookingstatus',
+'noofchildren',
+'childrenlivingstatus',
+'incms',
+'height',
+'bodytype',
+'complexion',
+'bloodgroup',
+'inlbs',
+'weight',
+'specialcase',
+'mothertongue',
+'mothertongueothers',
+'religion',
+'caste',
+'casteothers',
+'subcaste',
+'subcasteid',
+'castenobar',
+'gothra',
+'gothraid',
+'star',
+'raasi',
+'suddhajadhagam',
+'dosham',
+'zodiacsign',
+'eatinghabits',
+'smokinghabits',
+'drinkinghabits',
+'educationselected',
+'educationid',
+'educationaddon',
+'education',
+'occupationcategory',
+'occupationselected',
+'occupation',
+'incomecurrency',
+'annualincome',
+'annualincomeininr',
+'income',
+'incometype',
+'citizenship',
+'countryselected',
+'residentstatus',
+'residingstate',
+'residingarea',
+'residingdistrict',
+'residingcity',
+'residingcityid',
+'tel',
+'profileverified',
+'phoneverified',
+'mobileverifiedon',
+'phoneprotected',
+'profiledescription',
+'familydetailsavailable',
+'hobbiesavailable',
+'filtersavailable',
+'privacysetting',
+'mobilealertsavailable',
+'photoavailable',
+'photoprotected',
+'horoscopeavailable',
+'horoscopeprotected',
+'birthdetailsavailable',
+'horoscopematch',
+'videoavailable',
+'videoprotected',
+'voiceavailable',
+'healthprofileavailable',
+'healthprofileprotected',
+'referenceavailable',
+'partnerprefset',
+'matchwatchemail',
+'lastlogin',
+'timemodified',
+'timeposted',
+'numberofpayments',
+'lastpayment',
+'validdays',
+'expirydate',
+'autorenewalstatus',
+'lastpaymentbyautorenewal',
+'lastpaymentthruonline',
+'lastonlinepaymentproductid',
+'uspaidvalidated',
+'receiveemail',
+'timecreated',
+'profilepublishedon',
+'bywhom',
+'referredby',
+'internalreferredby',
+'ipaddress',
+'comments',
+'webnotification',
+'webnotifydisableview',
+'promotionnotification',
+'dateupdated',
+'defaultview',
+'activityrank',
+'logincount',
+'pendingmodifyvalidation',
+'pendingphotovalidation',
+'photorank',
+'offeravailable',
+'offercategoryid',
+'skipseolisting',
+'invalidcontactno',
+'batchid'])
+
+
+# In[32]:
+
+
+fraud_ignored = pd.read_csv("Documents/Propensity/fraud detection/fraud_ignored.csv",sep="\t",names=['language',
+'matriid',
+'status',
+'authorized',
+'validated',
+'entrytype',
+'specialpriv',
+'powerpackopted',
+'powerpackstatus',
+'name',
+'age',
+'dayofbirth',
+'monofbirth',
+'yearofbirth',
+'gender',
+'maritalstatus',
+'lookingstatus',
+'noofchildren',
+'childrenlivingstatus',
+'incms',
+'height',
+'bodytype',
+'complexion',
+'bloodgroup',
+'inlbs',
+'weight',
+'specialcase',
+'mothertongue',
+'mothertongueothers',
+'religion',
+'caste',
+'casteothers',
+'subcaste',
+'subcasteid',
+'castenobar',
+'gothra',
+'gothraid',
+'star',
+'raasi',
+'suddhajadhagam',
+'dosham',
+'zodiacsign',
+'eatinghabits',
+'smokinghabits',
+'drinkinghabits',
+'educationselected',
+'educationid',
+'educationaddon',
+'education',
+'occupationcategory',
+'occupationselected',
+'occupation',
+'incomecurrency',
+'annualincome',
+'annualincomeininr',
+'income',
+'incometype',
+'citizenship',
+'countryselected',
+'residentstatus',
+'residingstate',
+'residingarea',
+'residingdistrict',
+'residingcity',
+'residingcityid',
+'tel',
+'profileverified',
+'phoneverified',
+'mobileverifiedon',
+'phoneprotected',
+'profiledescription',
+'familydetailsavailable',
+'hobbiesavailable',
+'filtersavailable',
+'privacysetting',
+'mobilealertsavailable',
+'photoavailable',
+'photoprotected',
+'horoscopeavailable',
+'horoscopeprotected',
+'birthdetailsavailable',
+'horoscopematch',
+'videoavailable',
+'videoprotected',
+'voiceavailable',
+'healthprofileavailable',
+'healthprofileprotected',
+'referenceavailable',
+'partnerprefset',
+'matchwatchemail',
+'lastlogin',
+'timemodified',
+'timeposted',
+'numberofpayments',
+'lastpayment',
+'validdays',
+'expirydate',
+'autorenewalstatus',
+'lastpaymentbyautorenewal',
+'lastpaymentthruonline',
+'lastonlinepaymentproductid',
+'uspaidvalidated',
+'receiveemail',
+'timecreated',
+'profilepublishedon',
+'bywhom',
+'referredby',
+'internalreferredby',
+'ipaddress',
+'comments',
+'webnotification',
+'webnotifydisableview',
+'promotionnotification',
+'dateupdated',
+'defaultview',
+'activityrank',
+'logincount',
+'pendingmodifyvalidation',
+'pendingphotovalidation',
+'photorank',
+'offeravailable',
+'offercategoryid',
+'skipseolisting',
+'invalidcontactno',
+'batchid'])
+
+
+# In[29]:
+
+
+fraud_inactive = pd.read_csv("Documents/Propensity/fraud detection/fraud_inactive.csv",sep="\t",names=['language',
+'matriid',
+'status',
+'authorized',
+'validated',
+'entrytype',
+'specialpriv',
+'powerpackopted',
+'powerpackstatus',
+'name',
+'age',
+'dayofbirth',
+'monofbirth',
+'yearofbirth',
+'gender',
+'maritalstatus',
+'lookingstatus',
+'noofchildren',
+'childrenlivingstatus',
+'incms',
+'height',
+'bodytype',
+'complexion',
+'bloodgroup',
+'inlbs',
+'weight',
+'specialcase',
+'mothertongue',
+'mothertongueothers',
+'religion',
+'caste',
+'casteothers',
+'subcaste',
+'subcasteid',
+'castenobar',
+'gothra',
+'gothraid',
+'star',
+'raasi',
+'suddhajadhagam',
+'dosham',
+'zodiacsign',
+'eatinghabits',
+'smokinghabits',
+'drinkinghabits',
+'educationselected',
+'educationid',
+'educationaddon',
+'education',
+'occupationcategory',
+'occupationselected',
+'occupation',
+'incomecurrency',
+'annualincome',
+'annualincomeininr',
+'income',
+'incometype',
+'citizenship',
+'countryselected',
+'residentstatus',
+'residingstate',
+'residingarea',
+'residingdistrict',
+'residingcity',
+'residingcityid',
+'tel',
+'profileverified',
+'phoneverified',
+'mobileverifiedon',
+'phoneprotected',
+'profiledescription',
+'familydetailsavailable',
+'hobbiesavailable',
+'filtersavailable',
+'privacysetting',
+'mobilealertsavailable',
+'photoavailable',
+'photoprotected',
+'horoscopeavailable',
+'horoscopeprotected',
+'birthdetailsavailable',
+'horoscopematch',
+'videoavailable',
+'videoprotected',
+'voiceavailable',
+'healthprofileavailable',
+'healthprofileprotected',
+'referenceavailable',
+'partnerprefset',
+'matchwatchemail',
+'lastlogin',
+'timemodified',
+'timeposted',
+'numberofpayments',
+'lastpayment',
+'validdays',
+'expirydate',
+'autorenewalstatus',
+'lastpaymentbyautorenewal',
+'lastpaymentthruonline',
+'lastonlinepaymentproductid',
+'uspaidvalidated',
+'receiveemail',
+'timecreated',
+'profilepublishedon',
+'bywhom',
+'referredby',
+'internalreferredby',
+'ipaddress',
+'comments',
+'webnotification',
+'webnotifydisableview',
+'promotionnotification',
+'dateupdated',
+'defaultview',
+'activityrank',
+'logincount',
+'pendingmodifyvalidation',
+'pendingphotovalidation',
+'photorank',
+'offeravailable',
+'offercategoryid',
+'skipseolisting',
+'invalidcontactno',
+'batchid'])
+
+
+# In[24]:
+
+
+fraud_del = pd.read_csv("Documents/Propensity/fraud detection/fraud_del.csv",sep="\t",names=['language',
+'matriid',
+'password',
+'encpassword',
+'status',
+'authorized',
+'validated',
+'emailstatus',
+'entrytype',
+'specialpriv',
+'powerpackopted',
+'powerpackstatus',
+'name',
+'age',
+'dayofbirth',
+'monofbirth',
+'yearofbirth',
+'gender',
+'maritalstatus',
+'lookingstatus',
+'noofchildren',
+'childrenlivingstatus',
+'divorcedetails',
+'incms',
+'height',
+'bodytype',
+'complexion',
+'bloodgroup',
+'inlbs',
+'weight',
+'specialcase',
+'mothertongue',
+'mothertongueothers',
+'religion',
+'caste',
+'casteothers',
+'subcaste',
+'subcasteid',
+'castenobar',
+'gothra',
+'gothraid',
+'star',
+'raasi',
+'dosham',
+'zodiacsign',
+'suddhajadhagam',
+'eatinghabits',
+'smokinghabits',
+'drinkinghabits',
+'educationselected',
+'educationid',
+'educationaddon',
+'education',
+'occupationcategory',
+'occupationselected',
+'occupation',
+'incomecurrency',
+'annualincome',
+'annualincomeininr',
+'income',
+'incometype',
+'citizenship',
+'countryselected',
+'residentstatus',
+'residingstate',
+'residingarea',
+'residingdistrict',
+'residingcity',
+'residingcityid',
+'email',
+'encemail',
+'tel',
+'profileverified',
+'phoneverified',
+'mobileverifiedon',
+'phoneprotected',
+'profiledescription',
+'familydetailsavailable',
+'hobbiesavailable',
+'filtersavailable',
+'privacysetting',
+'mobilealertsavailable',
+'photoavailable',
+'photoprotected',
+'horoscopeavailable',
+'horoscopeprotected',
+'birthdetailsavailable',
+'horoscopematch',
+'videoavailable',
+'videoprotected',
+'voiceavailable',
+'healthprofileavailable',
+'healthprofileprotected',
+'referenceavailable',
+'partnerprefset',
+'matchwatchemail',
+'lastlogin',
+'timemodified',
+'timeposted',
+'numberofpayments',
+'lastpayment',
+'validdays',
+'expirydate',
+'autorenewalstatus',
+'lastpaymentbyautorenewal',
+'lastpaymentthruonline',
+'lastonlinepaymentproductid',
+'uspaidvalidated',
+'receiveemail',
+'timecreated',
+'profilepublishedon',
+'bywhom',
+'referredby',
+'internalreferredby',
+'ipaddress',
+'comments',
+'datedeleted',
+'webnotification',
+'webnotifydisableview',
+'promotionnotification',
+'reason',
+'reasonindetail',
+'defaultview',
+'activityrank',
+'logincount',
+'pendingmodifyvalidation',
+'pendingphotovalidation',
+'photorank',
+'offeravailable',
+'offercategoryid',
+'skipseolisting',
+'invalidcontactno',
+'dumptime',
+'processid',
+'batchid',
+'processname'])
+
+
+# In[30]:
+
+
+fraud_del1=fraud_del[['language',
+'matriid',
+'status',
+'authorized',
+'validated',
+'entrytype',
+'specialpriv',
+'powerpackopted',
+'powerpackstatus',
+'name',
+'age',
+'dayofbirth',
+'monofbirth',
+'yearofbirth',
+'gender',
+'maritalstatus',
+'lookingstatus',
+'noofchildren',
+'childrenlivingstatus',
+'incms',
+'height',
+'bodytype',
+'complexion',
+'bloodgroup',
+'inlbs',
+'weight',
+'specialcase',
+'mothertongue',
+'mothertongueothers',
+'religion',
+'caste',
+'casteothers',
+'subcaste',
+'subcasteid',
+'castenobar',
+'gothra',
+'gothraid',
+'star',
+'raasi',
+'suddhajadhagam',
+'dosham',
+'zodiacsign',
+'eatinghabits',
+'smokinghabits',
+'drinkinghabits',
+'educationselected',
+'educationid',
+'educationaddon',
+'education',
+'occupationcategory',
+'occupationselected',
+'occupation',
+'incomecurrency',
+'annualincome',
+'annualincomeininr',
+'income',
+'incometype',
+'citizenship',
+'countryselected',
+'residentstatus',
+'residingstate',
+'residingarea',
+'residingdistrict',
+'residingcity',
+'residingcityid',
+'tel',
+'profileverified',
+'phoneverified',
+'mobileverifiedon',
+'phoneprotected',
+'profiledescription',
+'familydetailsavailable',
+'hobbiesavailable',
+'filtersavailable',
+'privacysetting',
+'mobilealertsavailable',
+'photoavailable',
+'photoprotected',
+'horoscopeavailable',
+'horoscopeprotected',
+'birthdetailsavailable',
+'horoscopematch',
+'videoavailable',
+'videoprotected',
+'voiceavailable',
+'healthprofileavailable',
+'healthprofileprotected',
+'referenceavailable',
+'partnerprefset',
+'matchwatchemail',
+'lastlogin',
+'timemodified',
+'timeposted',
+'numberofpayments',
+'lastpayment',
+'validdays',
+'expirydate',
+'autorenewalstatus',
+'lastpaymentbyautorenewal',
+'lastpaymentthruonline',
+'lastonlinepaymentproductid',
+'uspaidvalidated',
+'receiveemail',
+'timecreated',
+'profilepublishedon',
+'bywhom',
+'referredby',
+'internalreferredby',
+'ipaddress',
+'comments',
+'webnotification',
+'webnotifydisableview',
+'promotionnotification',
+
+'defaultview',
+'activityrank',
+'logincount',
+'pendingmodifyvalidation',
+'pendingphotovalidation',
+'photorank',
+'offeravailable',
+'offercategoryid',
+'skipseolisting',
+'invalidcontactno',
+'batchid']]
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[8]:
+
+
+fraud=pd.read_csv("Documents/Propensity/fraud detection/fraud.csv",sep="\t",names=['fraud_master_id',
+'fraud_source',
+'fraud_category',
+'fraud_sub_category',
+'fraud_reason',
+'matriid',
+'mobile_country_code',
+'enc_mobile_number',
+'landline_areacode',
+'enc_landline_number',
+'enc_email',
+'date_created',
+'sec_country_code',
+'enc_sec_mobile_number',
+'device_id',
+'device_ip',
+'photo_url',
+'sec_enc_email',
+'batchid',
+'dumptime'
+])
+
+
+# In[9]:
+
+
+fraud1 = fraud.loc[fraud['landline_areacode'] != '2020-01-02']
+
+
+# In[10]:
+
+
+fraud1.shape
+
+
+# In[12]:
+
+
+fraud1 = fraud1.assign(InDf2=fraud1.matriid.isin(fraud_concat_v3.matriid).astype(int))
+
+
+# In[ ]:
+
+
+fraud1 = fraud_ignored.assign(InDf2=fraud1.matriid.isin(fraud1.matriid).astype(int))
+
+
+# In[33]:
+
+
+fraud_concat = pd.concat([regdata,fraud_ignored,fraud_inactive,fraud_del1], axis=0, ignore_index=True)
+
+
+# In[43]:
+
+
+fraud_concat.shape
+
+
+# In[47]:
+
+
+fraud_concat_v1.to_csv("Documents/Propensity/fraud detection/fraud_concat_v1.csv",encoding='latin-1')
+
+
+# In[40]:
+
+
+fraud_concat = fraud_concat.assign(InDf2=fraud_concat.matriid.isin(fraud1.matriid).astype(int))
+
+
+# In[42]:
+
+
+fraud_concat['InDf2'].sum()
+
+
+# In[57]:
+
+
+registration1 = registration.loc[registration['InDf2']==1]
+
+
+# In[58]:
+
+
+registration = registration.assign(InDf2=registration.matriid.isin(fraud1.matriid).astype(int))
+
+
+# In[59]:
+
+
+registration['InDf2'].sum()
+
+
+# In[60]:
+
+
+registration1 = registration.loc[registration['InDf2']==1]
+
+
+# In[64]:
+
+
+fraud_concat_v2 = pd.merge(fraud_concat_v1,registration,how = 'left', on='matriid')
+
+
+# In[65]:
+
+
+fraud_concat_v2.shape
+
+
+# In[ ]:
+
+
+viewhistory = pd.read_csv("Documents/Propensity/fraud detection/query3_viewer.csv",sep="\t",names=['viewerid','matriid','syssource'])
+
+
+# In[2]:
+
+
+fraud_concat_v1=pd.read_csv("Documents/Propensity/fraud detection/fraud_concat_v1.csv",encoding='latin-1')
+
+
+# In[3]:
+
+
+nume=fraud_concat_v1._get_numeric_data().columns
+# list(all_16k_dummy_1.select_dtypes(include=['object']).columns)
+
+
+# In[9]:
+
+
+fraud_concat_v2 = fraud_concat_v1
+
+
+# In[14]:
+
+
+nume
+
+
+# In[5]:
+
+
+fraud_concat_v3 = fraud_concat_v2[['language',
+ 'status',
+ 'authorized',
+ 'validated',
+ 'specialpriv',
+ 'powerpackopted',
+ 'powerpackstatus',
+ 'age',
+ 'dayofbirth',
+ 'monofbirth',
+ 'yearofbirth',
+ 'maritalstatus',
+ 'lookingstatus',
+ 'noofchildren',
+ 'childrenlivingstatus',
+ 'incms',
+ 'height',
+ 'bodytype',
+ 'complexion',
+ 'bloodgroup',
+ 'inlbs',
+ 'weight',
+ 'specialcase',
+ 'mothertongue',
+ 'mothertongueothers',
+ 'religion',
+ 'caste',
+ 'subcasteid',
+ 'castenobar',
+ 'gothraid',
+ 'star',
+ 'raasi',
+ 'suddhajadhagam',
+ 'dosham',
+ 'zodiacsign',
+ 'eatinghabits',
+ 'smokinghabits',
+ 'drinkinghabits',
+ 'educationselected',
+ 'educationid',
+ 'educationaddon',
+ 'occupationcategory',
+ 'occupationselected',
+ 'incomecurrency',
+ 'annualincome',
+ 'annualincomeininr',
+ 'incometype',
+ 'citizenship',
+ 'countryselected',
+ 'residentstatus',
+ 'residingstate',
+ 'residingdistrict',
+ 'residingcityid',
+ 'profileverified',
+ 'phoneverified',
+ 'familydetailsavailable',
+ 'hobbiesavailable',
+ 'filtersavailable',
+ 'privacysetting',
+ 'mobilealertsavailable',
+ 'photoavailable',
+ 'horoscopeavailable',
+ 'birthdetailsavailable',
+ 'horoscopematch',
+ 'videoavailable',
+ 'voiceavailable',
+ 'healthprofileavailable',
+ 'referenceavailable',
+ 'partnerprefset',
+ 'matchwatchemail',
+ 'numberofpayments',
+ 'validdays',
+ 'autorenewalstatus',
+ 'lastpaymentthruonline',
+ 'lastonlinepaymentproductid',
+ 'uspaidvalidated',
+ 'receiveemail',
+ 'bywhom',
+ 'referredby',
+ 'internalreferredby',
+ 'webnotification',
+ 'webnotifydisableview',
+ 'promotionnotification',
+ 'logincount',
+ 'pendingmodifyvalidation',
+ 'photorank',
+ 'offeravailable',
+ 'offercategoryid',
+ 'skipseolisting',
+ 'invalidcontactno',
+ 'InDf2']]
+
+
+# In[ ]:
+
+
+fraud_concat_v3 = fraud_concat_v2[['language',
+ 'status',
+
+ 'specialpriv',
+ 'powerpackopted',
+ 'powerpackstatus',
+ 'age',
+ 'dayofbirth',
+ 'monofbirth',
+ 'yearofbirth',
+ 'maritalstatus',
+ 'lookingstatus',
+ 'noofchildren',
+ 'childrenlivingstatus',
+ 'incms',
+ 'height',
+ 'bodytype',
+ 'complexion',
+ 'bloodgroup',
+ 'inlbs',
+ 'weight',
+ 'specialcase',
+ 'mothertongue',
+ 'mothertongueothers',
+ 'religion',
+ 'caste',
+ 'subcasteid',
+ 'castenobar',
+ 'gothraid',
+ 'star',
+ 'raasi',
+ 'suddhajadhagam',
+ 'dosham',
+ 'zodiacsign',
+ 'eatinghabits',
+ 'smokinghabits',
+ 'drinkinghabits',
+ 'educationselected',
+ 'educationid',
+ 'educationaddon',
+ 'occupationcategory',
+ 'occupationselected',
+ 'incomecurrency',
+ 'annualincome',
+ 'annualincomeininr',
+ 'incometype',
+ 'citizenship',
+ 'countryselected',
+ 'residentstatus',
+ 'residingstate',
+ 'residingdistrict',
+ 'residingcityid',
+ 'profileverified',
+ 'phoneverified',
+ 'familydetailsavailable',
+ 'hobbiesavailable',
+ 'filtersavailable',
+ 'privacysetting',
+ 'mobilealertsavailable',
+ 'photoavailable',
+ 'horoscopeavailable',
+ 'birthdetailsavailable',
+ 'horoscopematch',
+
+ 'healthprofileavailable',
+ 'referenceavailable',
+ 'partnerprefset',
+ 'matchwatchemail',
+ 'numberofpayments',
+ 'validdays',
+ 'autorenewalstatus',
+ 'lastpaymentthruonline',
+ 'lastonlinepaymentproductid',
+ 'uspaidvalidated',
+ 'receiveemail',
+ 'bywhom',
+ 'referredby',
+ 'internalreferredby',
+ 'webnotification',
+ 'webnotifydisableview',
+ 'promotionnotification',
+ 'logincount',
+ 'pendingmodifyvalidation',
+ 'photorank',
+ 'offeravailable',
+ 'offercategoryid',
+ 'skipseolisting',
+ 'invalidcontactno',
+ 'InDf2']]
+
+
+# In[10]:
+
+
+catg_all_encoding_Y = pd.DataFrame()
+catg_all_encoding_Y['InDf2']=fraud_concat_v3[ 'InDf2']
+catg_all_encoding_X=fraud_concat_v3.drop(columns=['InDf2'])
+
+
+# In[8]:
+
+
+from sklearn.feature_selection import RFE
+from sklearn.linear_model import LinearRegression
+# X=c2_train_x
+X.fillna(0, inplace=True)
+# Y = c2_train_y
+model = LinearRegression()
+rfe = RFE(model,3)
+X_rfe = rfe.fit_transform(X,Y)
+model.fit(X_rfe,Y)
+print(rfe.support_)
+print(rfe.ranking_)
+
+
+# In[7]:
+
+
+import logging
+import pandas as pd
+import numpy as np
+from numpy import random
+import gensim
+import nltk
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.metrics import accuracy_score, confusion_matrix
+import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
+import re
+from bs4 import BeautifulSoup
+catg_all_encoding_X.replace([np.inf, -np.inf], np.nan, inplace=True)
+catg_all_encoding_X.fillna(0,inplace=False)
+# catg_all_encoding_X==catg_all_encoding_X.transform(lambda x: x/x.max())
+
+X=catg_all_encoding_X
+Y = catg_all_encoding_Y
+X=catg_all_encoding_X.transform(lambda x: x/x.max())
+
+# Stratified
+X_train,X_test,Y_train,Y_test = train_test_split(X,Y,stratify = Y,test_size = .3,random_state = 0)
+
+
+from sklearn import preprocessing
+def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
+    lb = preprocessing.LabelBinarizer()
+    lb.fit(y_test)
+    y_test = lb.transform(y_test)
+    y_pred = lb.transform(y_pred)
+    return roc_auc_score(y_test, y_pred, average="macro")
+
+
+
+
+
+from xgboost import plot_tree
+import xgboost as xgb
+model = xgb.XGBClassifier()
+model.fit(X_train,Y_train)
+y_xgb_pred = model.predict(X_test)
+cm = confusion_matrix(Y_test,y_xgb_pred)
+print(cm)
+print(classification_report(Y_test, y_xgb_pred))
+accuracy = accuracy_score(Y_test,y_xgb_pred )
+print("Accuracy: %.2f%%" % (accuracy * 100.0))
+roc = multiclass_roc_auc_score(Y_test, y_xgb_pred)
+print("ROC:",roc)
+pred_probas  = model.predict_proba(X_test)
+import scikitplot as skplt
+skplt.metrics.plot_roc(Y_test, pred_probas)
+plt.show() 
+
+
+# In[23]:
+
+
+import logging
+import pandas as pd
+import numpy as np
+from numpy import random
+import gensim
+import nltk
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.metrics import accuracy_score, confusion_matrix
+import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
+import re
+from bs4 import BeautifulSoup
+catg_all_encoding_X.replace([np.inf, -np.inf], np.nan, inplace=True)
+catg_all_encoding_X.fillna(0,inplace=False)
+catg_all_encoding_X==catg_all_encoding_X.transform(lambda x: x/x.max())
+
+
+
+import logging
+import pandas as pd
+import numpy as np
+from numpy import random
+import gensim
+import nltk
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.metrics import accuracy_score, confusion_matrix
+import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
+import re
+from bs4 import BeautifulSoup
+# X = catg_all_encoding1_train
+# Y= catg_all_encoding_target
+X=catg_all_encoding_X
+Y = catg_all_encoding_Y
+
+X=catg_all_encoding_X.transform(lambda x: x/x.max())
+# Stratified
+X_train,X_test,Y_train,Y_test = train_test_split(X,Y,stratify = Y,test_size = .3,random_state = 0)
+
+
+from sklearn import preprocessing
+def multiclass_roc_auc_score(Y_test, y_pred, average="macro"):
+    lb = preprocessing.LabelBinarizer()
+    lb.fit(Y_test)
+    Y_test = lb.transform(Y_test)
+    y_pred = lb.transform(y_pred)
+    return roc_auc_score(y_test, y_pred, average="macro")
+
+
+
+from xgboost import plot_tree
+import xgboost as xgb
+model = xgb.XGBClassifier()
+model.fit(X_train,Y_train)
+y_xgb_pred = model.predict(X_test)
+cm = confusion_matrix(Y_test,y_xgb_pred)
+print(cm)
+print(classification_report(Y_test, y_xgb_pred))
+accuracy = accuracy_score(Y_test,y_xgb_pred )
+print("Accuracy: %.2f%%" % (accuracy * 100.0))
+roc = multiclass_roc_auc_score(Y_test, y_xgb_pred)
+print("ROC:",roc)
+pred_probas  = model.predict_proba(X_test)
+import scikitplot as skplt
+skplt.metrics.plot_roc(Y_test, pred_probas)
+plt.show() 
+
+
+# In[11]:
+
+
+import logging
+import pandas as pd
+import numpy as np
+from numpy import random
+from sklearn.metrics import classification_report
+import gensim
+import nltk
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.metrics import accuracy_score, confusion_matrix
+import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
+import re
+from bs4 import BeautifulSoup
+catg_all_encoding_X.replace([np.inf, -np.inf], np.nan, inplace=True)
+catg_all_encoding_X.fillna(0,inplace=False)
+# catg_all_encoding_X==catg_all_encoding_X.transform(lambda x: x/x.max())
+
+
+
+import logging
+import pandas as pd
+import numpy as np
+from numpy import random
+import gensim
+import nltk
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.metrics import accuracy_score, confusion_matrix
+import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
+import re
+from bs4 import BeautifulSoup
+# X = catg_all_encoding1_train
+# Y= catg_all_encoding_target
+X=catg_all_encoding_X
+Y = catg_all_encoding_Y
+X=catg_all_encoding_X.transform(lambda x: x/x.max())
+
+# Stratified
+X_train,X_test,Y_train,Y_test = train_test_split(X,Y,stratify = Y,test_size = .3,random_state = 0)
+
+
+from sklearn import preprocessing
+def multiclass_roc_auc_score(Y_test, y_pred, average="macro"):
+    lb = preprocessing.LabelBinarizer()
+    lb.fit(Y_test)
+    Y_test = lb.transform(Y_test)
+    y_pred = lb.transform(y_pred)
+    return roc_auc_score(y_test, y_pred, average="macro")
+
+
+
+
+from xgboost import plot_tree
+import xgboost as xgb
+model = xgb.XGBClassifier()
+model.fit(X_train,Y_train)
+y_xgb_pred = model.predict(X_test)
+cm = confusion_matrix(Y_test,y_xgb_pred)
+print(cm)
+print(classification_report(Y_test, y_xgb_pred))
+accuracy = accuracy_score(Y_test,y_xgb_pred )
+print("Accuracy: %.2f%%" % (accuracy * 100.0))
+roc = multiclass_roc_auc_score(Y_test, y_xgb_pred)
+print("ROC:",roc)
+pred_probas  = model.predict_proba(X_test)
+import scikitplot as skplt
+skplt.metrics.plot_roc(Y_test, pred_probas)
+plt.show() 
+
+
+# In[30]:
+
+
+from sklearn.linear_model import LassoCV
+reg = LassoCV()
+X_train.replace([np.inf, -np.inf], np.nan, inplace=True)
+X_train.fillna(0,inplace=True)
+X_test.replace([np.inf, -np.inf], np.nan, inplace=True)
+X_test.fillna(0,inplace=True)
+X_train=X_train.drop(columns=['incomecurrency',
+ 'annualincome',
+ 'annualincomeininr'])
+reg.fit(X_train, Y_train)
+print("Best alpha using built-in LassoCV: %f" % reg.alpha_)
+print("Best score using built-in LassoCV: %f" %reg.score(X_train, Y_train))
+coef = pd.Series(reg.coef_, index = X_train.columns)
+imp_coef = coef.sort_values()
+import matplotlib
+matplotlib.rcParams['figure.figsize'] = (8.0, 10.0)
+imp_coef.plot(kind = "barh")
+plt.title("Feature importance using Lasso Model")
+imp_coef.to_csv("Documents/Propensity/fraud detection/vif_4month.csv")
+
+
+# In[34]:
+
+
+from patsy import dmatrices
+# import statsmodels.api as sm
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+vif = pd.DataFrame()
+
+vif["VIF Factor"] = [variance_inflation_factor(catg_all_encoding_X.values, i) for i in range(catg_all_encoding_X.shape[1])]
+
+vif["features"] = catg_all_encoding_X.columns
+v=  vif.round(1)
+v.to_csv("Documents/Propensity/fraud detection/Vif_data.csv")
+
+
+# In[16]:
+
+
+import logging
+import pandas as pd
+import numpy as np
+from numpy import random
+import gensim
+import nltk
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.metrics import accuracy_score, confusion_matrix
+import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
+import re
+from bs4 import BeautifulSoup
+# catg_all_encoding_X.replace([np.inf, -np.inf], np.nan, inplace=True)
+catg_all_encoding_X.fillna(0,inplace=False)
+# catg_all_encoding_X==catg_all_encoding_X.transform(lambda x: x/x.max())
+
+
+
+import logging
+import pandas as pd
+import numpy as np
+from numpy import random
+import gensim
+import nltk
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.metrics import accuracy_score, confusion_matrix
+import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
+import re
+from bs4 import BeautifulSoup
+# X = catg_all_encoding1_train
+# Y= catg_all_encoding_target
+X=catg_all_encoding_X
+# X=X.drop(columns=['annualincome','validated'])
+Y = catg_all_encoding_Y
+
+
+# Stratified
+X_train,X_test,Y_train,Y_test = train_test_split(X,Y,stratify = Y,test_size = .3,random_state = 0)
+
+
+from sklearn import preprocessing
+def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
+    lb = preprocessing.LabelBinarizer()
+    lb.fit(y_test)
+    y_test = lb.transform(y_test)
+    y_pred = lb.transform(y_pred)
+    return roc_auc_score(y_test, y_pred, average="macro")
+
+
+from sklearn.linear_model import LogisticRegression
+lr = LogisticRegression(random_state = 0,solver = 'newton-cg') 
+#lr = LogisticRegression(random_state = 0) 
+lr.fit(X_train,Y_train)
+
+y_pred = lr.predict(X_test)
+score_rf = accuracy_score(Y_test, y_pred)
+cm = confusion_matrix(Y_test,y_pred)
+# roc = multiclass_roc_auc_score(Y_test,y_pred)
+print(cm)
+print(classification_report(Y_test, y_pred))
+print("Test Accuracy:",score_rf)
+# print("ROC:",roc)
+pred_probas  = lr.predict_proba(X_test)
+import scikitplot as skplt
+skplt.metrics.plot_roc(Y_test, pred_probas)
+plt.show()
+
